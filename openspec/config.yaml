@@ -4,7 +4,7 @@ schema: spec-driven
 # This is shown to AI when creating artifacts.
 context: |
   Tech stack:
-  - Frontend: React 18, TypeScript, Rsbuild
+  - Frontend: React 18, TypeScript, Rsbuild, Ant Design (antd)
   - Backend: Egg.js, TypeScript, MySQL
   - Vector store: LanceDB（Node 嵌入式，vectordb 包，数据落本地目录）
   Domain: RAG 知识库问答（文档处理、向量存储、检索匹配、答案生成）
