@@ -1,8 +1,12 @@
-## ADDED Requirements
+## Purpose
+
+为文本片段生成向量并写入 LanceDB；仅存向量与 chunk_id，支持按查询向量 top-k 检索，原文由 MySQL 管理。
+
+## Requirements
 
 ### Requirement: 系统为文本片段生成向量
 
-系统必须通过统一抽象（如 EmbeddingProvider）调用配置的嵌入模型或 API，为每个文本片段（来自文档处理）生成向量嵌入，并记录或发出「向量生成完成」。
+系统必须通过统一抽象（如 EmbeddingProvider）调用配置的嵌入模型或 API，为每个文本片段（来自文档处理）生成向量嵌入，并记录或发出「向量生成完成」。（MUST）
 
 #### Scenario: 为新片段生成向量
 
@@ -18,7 +22,7 @@
 
 ### Requirement: 系统持久化向量与片段标识
 
-系统必须将生成的向量与 chunk_id 写入向量库（LanceDB）；原文与文档元数据由文档处理写入 MySQL，向量库不存原文。系统必须记录或发出「向量存储完成」。
+系统必须将生成的向量与 chunk_id 写入向量库（LanceDB）；原文与文档元数据由文档处理写入 MySQL，向量库不存原文，并记录或发出「向量存储完成」。（MUST）
 
 #### Scenario: 为片段存储向量
 
@@ -34,7 +38,7 @@
 
 ### Requirement: 系统支持按查询向量检索
 
-系统必须接受查询向量，并返回按相似度排序的 chunk_id 列表（及分数），数量为 top-k（k 可配置，如 5～10）；原文由调用方根据 chunk_id 从 MySQL 获取。
+系统必须接受查询向量，并返回按相似度排序的 chunk_id 列表（及分数），数量为 top-k（k 可配置，如 5～10）；原文由调用方根据 chunk_id 从 MySQL 获取。（MUST）
 
 #### Scenario: 按查询向量 top-k 检索
 
