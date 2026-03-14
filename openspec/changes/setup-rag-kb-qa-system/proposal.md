@@ -26,6 +26,6 @@
 ## Impact
 
 - **新增**：文档处理服务/模块、向量存储（含嵌入模型与向量库）、检索服务、答案生成服务（含与 LLM 的集成）。
-- **技术栈**（与 design 一致）：前端 React 18 + TypeScript、Rsbuild、组件库 Ant Design（antd）；后端 Egg.js + TypeScript；数据层 MySQL（文档与片段元数据及原文）；向量存储 LanceDB（Node 嵌入式，仅存向量与 chunk_id）。
+- **技术栈**（与 design 一致）：前端 React 18 + TypeScript、Rsbuild、组件库 Ant Design；后端 Egg.js + TypeScript；数据层 MySQL（文档与片段元数据及原文）；向量存储 LanceDB（Node 嵌入式，仅存向量与 chunk_id）。
 - **依赖**：嵌入模型（或 API）、LanceDB 向量库、MySQL、可选 LLM 服务（答案生成）。
 - **接口**：首版 REST API——管理员侧文档上传、文档列表、文档删除；用户侧问答接口（请求 question，返回 answer + 引用片段）。

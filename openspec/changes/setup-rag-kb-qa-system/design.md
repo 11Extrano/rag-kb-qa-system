@@ -2,7 +2,7 @@
 
 本方案面向基于自有文档构建知识库并支持自然语言问答的 RAG（检索增强生成）系统，采用领域驱动设计（DDD）划分界限上下文：文档处理、向量存储、检索匹配、答案生成。领域事件与角色已通过事件风暴确定：系统管理员负责文档上传与知识库管理，用户发起检索并获取基于文档内容的答案。
 
-当前为从零建设阶段，无既有代码或历史约束。技术栈已确定：前端采用 React 18 + TypeScript，构建工具为 Rsbuild，组件库为 Ant Design（antd，与 React 搭配成熟、生态完善）；后端采用 Egg.js + TypeScript，数据层使用 MySQL；向量存储采用 LanceDB（Node 嵌入式）。上述选型作为本设计文档的既定前提。
+当前为从零建设阶段，无既有代码或历史约束。技术栈已确定：前端采用 React 18 + TypeScript，构建工具为 Rsbuild，组件库为 Ant Design；后端采用 Egg.js + TypeScript，数据层使用 MySQL；向量存储采用 LanceDB（Node 嵌入式）。上述选型作为本设计文档的既定前提。
 
 ## 目标与非目标
 
@@ -25,9 +25,9 @@
    - **理由**：与领域模型一致，便于后续微服务或单体内包边界划分。其他方案（如“检索+生成合并”）会模糊职责，不利于单独扩展检索或生成策略。
 
 2. **技术栈**  
-   - **前端**：React 18 + TypeScript，构建工具 Rsbuild，组件库 Ant Design（antd）。  
+   - **前端**：React 18 + TypeScript，构建工具 Rsbuild，组件库 Ant Design。  
    - **后端**：Egg.js + TypeScript，关系型数据 MySQL（文档元数据、文本片段等可落库；向量仍由向量库存储）。  
-   - **理由**：统一 TypeScript 便于类型共享与协作；antd 与 React 搭配成熟、组件丰富，Rsbuild 与 Egg 与现有生态兼容，利于首版交付与后续迭代。
+   - **理由**：统一 TypeScript 便于类型共享与协作；Ant Design 与 React 搭配成熟、组件丰富，Rsbuild 与 Egg 与现有生态兼容，利于首版交付与后续迭代。
 
 3. **文本分块策略（组合思路）**  
    - **第一段：按结构切（可选）**  
