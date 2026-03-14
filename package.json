@@ -1,0 +1,16 @@
+{
+  "name": "rag-kb-qa-system",
+  "version": "1.0.0",
+  "description": "RAG 知识库问答系统 - 基于文档的检索增强生成",
+  "private": true,
+  "scripts": {
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "build:server": "cd server && npm run build",
+    "build:client": "cd client && npm run build",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

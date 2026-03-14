@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "lib": ["ES2020"],
+    "strict": true,
+    "noImplicitAny": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "outDir": "dist",
+    "rootDir": ".",
+    "declaration": true,
+    "declarationDir": "typings",
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["app/*"]
+    },
+    "skipLibCheck": true
+  },
+  "include": [
+    "app/**/*.ts",
+    "config/**/*.ts",
+    "typings/**/*.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

@@ -1,0 +1,25 @@
+node_modules/
+dist/
+*.js.map
+*.d.ts
+!**/typings/**/*.d.ts
+run/
+logs/
+.lancedb-data/
+*.log
+.env
+.env.local
+coverage/
+.nyc_output/
+
+# server (Egg.js)
+server/node_modules/
+server/dist/
+server/run/
+server/logs/
+server/typings/app/
+server/typings/config/
+
+# client (前端构建产物)
+client/node_modules/
+client/dist/
