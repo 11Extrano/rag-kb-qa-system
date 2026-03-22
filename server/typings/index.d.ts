@@ -27,12 +27,19 @@ declare module 'egg' {
     topK: number;
   }
 
+  interface RagConversationConfig {
+    maxHistoryRounds: number;
+    maxInputTokens: number;
+    outputReserveTokens: number;
+  }
+
   interface RagConfig {
     lancedbPath: string;
     embedding: RagEmbeddingConfig;
     llm: RagLLMConfig;
     chunk: RagChunkConfig;
     retrieval: RagRetrievalConfig;
+    conversation: RagConversationConfig;
   }
 
   interface EggAppConfig {

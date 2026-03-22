@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Typography, Input, Button, Card, Collapse, Tag, Empty, message, Space, Spin,
 } from 'antd';
@@ -10,12 +10,52 @@ import type { QaResult } from '../types';
 const { Title, Paragraph, Text } = Typography;
 const { TextArea } = Input;
 
+const STORAGE_CONVERSATION_ID = 'rag_kb_conversation_id';
+
+/** 从 localStorage 读取已有会话 id，否则生成 UUID 并写入，供多轮问答与后端持久化对齐。 */
+function getOrCreateConversationId(): string {
+  try {
+    const existing = localStorage.getItem(STORAGE_CONVERSATION_ID);
+    if (existing?.trim()) return existing.trim();
+  } catch { /* ignore */ }
+  const id = typeof crypto !== 'undefined' && crypto.randomUUID
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  try {
+    localStorage.setItem(STORAGE_CONVERSATION_ID, id);
+  } catch { /* ignore */ }
+  return id;
+}
+
 export default function QaPage() {
+  const [conversationId, setConversationId] = useState(() => getOrCreateConversationId());
   const [question, setQuestion] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<QaResult | null>(null);
   const [hasAsked, setHasAsked] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const streamAbortRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_CONVERSATION_ID, conversationId);
+    } catch { /* ignore */ }
+  }, [conversationId]);
+
+  /** 新会话：中止当前流、换新 id、清空界面状态（不调用后端删会话）。 */
+  const handleNewSession = useCallback(() => {
+    streamAbortRef.current?.();
+    streamAbortRef.current = null;
+    const id = typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    setConversationId(id);
+    setQuestion('');
+    setResult(null);
+    setHasAsked(false);
+    setError(null);
+    setLoading(false);
+  }, []);
 
   const handleSubmit = () => {
     const q = question.trim();
@@ -29,20 +69,29 @@ export default function QaPage() {
     setResult({ question: q, answer: '', citations: [] });
     setHasAsked(true);
 
-    askQuestionStream(q, {
-      onChunk: (text) => {
-        setResult(prev => prev ? { ...prev, answer: prev.answer + text } : { question: q, answer: text, citations: [] });
+    const { abort } = askQuestionStream(
+      q,
+      {
+        onChunk: (text) => {
+          setResult(prev => prev ? { ...prev, answer: prev.answer + text } : { question: q, answer: text, citations: [] });
+        },
+        onCitations: (citations) => {
+          setResult(prev => prev ? { ...prev, citations } : { question: q, answer: '', citations });
+        },
+        onDone: () => {
+          setLoading(false);
+          streamAbortRef.current = null;
+        },
+        onError: (msg) => {
+          setError(msg);
+          setLoading(false);
+          streamAbortRef.current = null;
+          message.error(msg);
+        },
       },
-      onCitations: (citations) => {
-        setResult(prev => prev ? { ...prev, citations } : { question: q, answer: '', citations });
-      },
-      onDone: () => setLoading(false),
-      onError: (msg) => {
-        setError(msg);
-        setLoading(false);
-        message.error(msg);
-      },
-    });
+      { conversationId },
+    );
+    streamAbortRef.current = abort;
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -54,7 +103,10 @@ export default function QaPage() {
 
   return (
     <div style={{ maxWidth: 800, margin: '0 auto' }}>
-      <Title level={3}>知识库问答</Title>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
+        <Title level={3} style={{ margin: 0 }}>知识库问答</Title>
+        <Button onClick={handleNewSession}>新会话</Button>
+      </div>
 
       <Card style={{ marginBottom: 24 }}>
         <TextArea

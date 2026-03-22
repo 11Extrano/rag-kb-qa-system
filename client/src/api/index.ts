@@ -50,20 +50,27 @@ export async function askQuestion(question: string): Promise<QaResult> {
 }
 
 /**
- * 流式问答：POST /api/qa body { question, stream: true }，按 SSE 解析并回调 onChunk / onCitations / onDone / onError。
+ * 流式问答：POST /api/qa，body 含 `question`、`stream: true`；若传 `options.conversationId` 则附带多轮会话 id。
+ * 按 SSE 解析并回调 onChunk / onCitations / onDone / onError。
  */
 export function askQuestionStream(
   question: string,
   callbacks: AskQuestionStreamCallbacks,
+  options?: { conversationId?: string },
 ): { abort: () => void } {
   const controller = new AbortController();
   const { onChunk, onCitations, onDone, onError } = callbacks;
+  const conversationId = options?.conversationId;
 
   (async () => {
     const res = await fetch(`${BASE}/qa`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question, stream: true }),
+      body: JSON.stringify({
+        question,
+        stream: true,
+        ...(conversationId ? { conversationId } : {}),
+      }),
       signal: controller.signal,
     });
 
