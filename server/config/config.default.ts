@@ -62,7 +62,7 @@ export default (appInfo: EggAppInfo): any => {
     },
 
     retrieval: {
-      topK: Number(process.env.RETRIEVAL_TOP_K) || 5,
+      topK: Number(process.env.RETRIEVAL_TOP_K) || 2,
     },
 
     conversation: {
