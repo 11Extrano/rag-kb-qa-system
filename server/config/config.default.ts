@@ -64,6 +64,12 @@ export default (appInfo: EggAppInfo): any => {
     retrieval: {
       topK: Number(process.env.RETRIEVAL_TOP_K) || 5,
     },
+
+    conversation: {
+      maxHistoryRounds: Number(process.env.CONVERSATION_MAX_HISTORY_ROUNDS) || 10,
+      maxInputTokens: Number(process.env.CONVERSATION_MAX_INPUT_TOKENS) || 8000,
+      outputReserveTokens: Number(process.env.CONVERSATION_OUTPUT_RESERVE_TOKENS) || 1536,
+    },
   };
 
   return {

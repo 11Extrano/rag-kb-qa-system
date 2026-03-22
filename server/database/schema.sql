@@ -31,3 +31,23 @@ CREATE TABLE IF NOT EXISTS chunks (
   UNIQUE KEY chunks_chunk_id (chunk_id),
   KEY chunks_doc_id (doc_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 多轮对话：会话（conversation_id 由客户端 UUID）
+CREATE TABLE IF NOT EXISTS conversations (
+  conversation_id VARCHAR(36) NOT NULL,
+  created_at DATETIME(6) NULL,
+  updated_at DATETIME(6) NULL,
+  PRIMARY KEY (conversation_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 多轮对话：消息
+CREATE TABLE IF NOT EXISTS conversation_messages (
+  id INT NOT NULL AUTO_INCREMENT,
+  conversation_id VARCHAR(36) NOT NULL,
+  role ENUM('user', 'assistant') NOT NULL,
+  content MEDIUMTEXT NOT NULL,
+  created_at DATETIME(6) NULL,
+  updated_at DATETIME(6) NULL,
+  PRIMARY KEY (id),
+  KEY conversation_messages_conversation_id (conversation_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

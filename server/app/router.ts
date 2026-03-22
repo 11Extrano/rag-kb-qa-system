@@ -10,4 +10,7 @@ export default (app: Application) => {
 
   // 用户接口 - 问答
   router.post('/api/qa', controller.qa.ask);
+
+  // 当前会话消息（只读，不列举全部会话）
+  router.get('/api/conversations/:conversationId/messages', controller.conversation.messages);
 };
