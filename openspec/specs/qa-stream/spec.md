@@ -1,12 +1,10 @@
 ## Purpose
 
 在现有问答接口上通过请求参数支持流式输出：客户端在请求体中传 `stream: true` 即可获得 SSE 流式响应，服务端逐段推送答案片段，流结束后推送引用；前端消费 SSE 并逐段展示答案（打字机效果），最后展示引用。
-
 ## Requirements
-
 ### Requirement: 系统在现有问答接口上通过请求参数支持流式输出
 
-系统必须在现有问答接口（如 `POST /api/qa`）上支持可选请求参数（如请求体 `stream: true`）。当客户端传入该参数且为 true 时，响应必须为 **SSE** 流，逐段推送答案片段；未传或为 false 时，响应保持原有 JSON 一次性返回（`{ success, data: { question, answer, citations } }`）。流式路径下须先执行检索、再基于匹配结果流式调用 LLM 并写出；无匹配时须先输出友好提示再结束流。（MUST）
+系统必须在现有问答接口（如 `POST /api/qa`）上支持可选请求参数（如请求体 `stream: true`）。请求体须支持携带 **conversationId**（或实现约定的会话标识），以便与同一会话的多轮改写、检索与生成链路一致；未携带时可按单轮或无历史路径处理（与 `answer-generation` / `retrieval-match` delta 一致）。当客户端传入 `stream` 且为 true 时，响应必须为 **SSE** 流，逐段推送答案片段；未传或为 false 时，响应保持原有 JSON 一次性返回（`{ success, data: { question, answer, citations } }` 或兼容扩展字段）。流式路径下须先执行会话加载、检索前改写（若有历史）、检索、再基于匹配结果流式调用 LLM 并写出；无匹配时须先输出友好提示再结束流。（MUST）
 
 #### Scenario: 流式返回答案内容
 
@@ -21,9 +19,12 @@
 #### Scenario: 不传 stream 或 stream 为 false 时保持原有行为
 
 - **WHEN** 客户端调用 `POST /api/qa` 且未传 `stream` 或 `stream === false`
-- **THEN** 系统行为与流式引入前一致，返回 JSON 形式的完整 answer 与 citations
+- **THEN** 系统行为与仅流式参数语义一致：返回 JSON 形式的完整 answer 与 citations；若携带 `conversationId` 则须执行多轮链路但仍为 JSON 响应
 
----
+#### Scenario: 多轮会话下流式与一次性共用同一编排
+
+- **WHEN** 请求携带 `conversationId` 与 `stream: true`
+- **THEN** 系统必须与携带相同 `conversationId` 且 `stream: false` 时在改写、检索与 prompt 组装规则上一致，仅响应形式（SSE vs JSON）不同
 
 ### Requirement: 流式响应前后端统一按 SSE 格式
 
@@ -75,3 +76,4 @@
 
 - **WHEN** 流式请求处理过程中发生任意错误
 - **THEN** 服务端必须先写出 `event: error` 与 `data: <错误信息>`，再关闭连接；前端收到 error 后展示错误并结束加载
+
